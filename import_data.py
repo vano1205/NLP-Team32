@@ -28,3 +28,14 @@ f.close()
 #    for elt in kor :
 #        f.write(elt+'\n')
 #f.close()
+
+#if googletrans doesn't work, read kor_data.txt file
+
+#f=open('kor_data.txt', 'r')
+#data = f.readlines()
+#i=0
+#for word in data:
+#    kor.append(word.rstrip())
+#    engkor.append((eng[i], word.rstrip()))
+#    i=i+1
+#f.close()
