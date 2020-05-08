@@ -26,8 +26,10 @@ def divideKoreanLetter(korean_word):
     return r_lst
 
 # 7종성법에 의거하여 ㄱㄴㄷㄹㅁㅂㅇ 이외의 자음은 받침으로 올 수 없다. -> ERROR 처리
-kor2ipa_consonant = {'ㄱ' : ['',''], 'ㅋ' : ['','ERROR'], 'ㅇ' : ['',''], 'ㅎ' : ['','ERROR'],
-                    'ㄹ' : ['',''], 'ㄴ': ['n','n'], 'ㄷ':['t','t͈'], 'ㅁ':['m','m'],'ㅂ':['p', 'p_'],
+# first element is for consonant at upper part of the letter
+# second element is for consonant at lower part of the letter
+kor2ipa_consonant = {'ㄱ' : ['g', 'g'], 'ㅋ' : ['k','ERROR'], 'ㅇ' : ['', 'ŋ'], 'ㅎ' : ['h','ERROR'],
+                    'ㄹ' : ['l','l'], 'ㄴ': ['n','n'], 'ㄷ':['t','t͈'], 'ㅁ':['m','m'],'ㅂ':['p', 'p_'],
                     'ㅅ':['s','ERROR'],'ㅈ':['t͡ɕ','ERROR'],'ㅊ':['t͡ɕʰ','ERROR'],'ㅌ':['tʰ','ERROR'],'ㅍ':['pʰ','ERROR'],
                     'ㄲ':['k͈','ERROR'],'ㄸ':['t͈','ERROR'],'ㅃ':['p͈','ERROR'],'ㅆ':['s͈','ERROR'],'ㅉ':['t͈͡ɕ','ERROR']}
 
