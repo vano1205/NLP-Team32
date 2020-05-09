@@ -17,7 +17,7 @@ kor2ipa_vowels = {'ㅏ': 'a', 'ㅑ': 'ja', 'ㅓ': 'ʌ', 'ㅕ': 'jʌ', 'ㅗ': 'o'
 resultlist=[]
 g2p = G2p()
 
-kor_data = open('kor_data.txt', 'r')
+kor_data = open('dataset/kor_data.txt', 'r')
 words = kor_data.read().split('\n')
 kor_data.close()
 for word in words:

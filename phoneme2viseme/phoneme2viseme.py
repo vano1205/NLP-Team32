@@ -43,8 +43,8 @@ def pho2vi(phoneme_list):
 
 # # For testing
 cmu_d = nltk.corpus.cmudict.dict()
-f = open("data.txt", 'r')
-out = open("en_viseme.txt", 'w')
+f = open("dataset/data.txt", 'r')
+out = open("phoneme2viseme/en_viseme.txt", 'w')
 for l in f.readlines():
     out.write("%s\n" % pho2vi(cmu_d[l.strip()][0]))
 f.close()
@@ -99,6 +99,6 @@ ko_pho = [['n', 'a', ' ', 'p͈', 'ɯ', 'n'], ['m', 'u', ' ', 'l', 'ʌ', ' ', 'p\
           ['t͡ɕ', 'a', ' ', '', 'ɛ', ' ', 'l', 'o', ' ', '', 'u', 'n'],
           ['m', 'i', ' ', 't', 'ɯ', 'l', 's͈', 'u', ' ', '', 'ʌ', 'm', 'n', 'ɯ', 'n'],
           ['', 'i', ' ', 's', 'a', 'ŋ', 'h', 'a', 'n']]
-out2 = open("ko_viseme.txt", 'w')
+out2 = open("phoneme2viseme/ko_viseme.txt", 'w')
 for l in ko_pho:
     out2.write("%s\n" % pho2vi(l))
