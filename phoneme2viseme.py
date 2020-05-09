@@ -13,15 +13,16 @@ arpa2vi_dict = {'AA': 'a', 'AE': 'a', 'AH': 'E', 'AO': 'O', 'AW': 'a', 'AX': '@'
                'EL': 'l', 'EM': 'm', 'EN': 'n', 'F': 'f', 'G': 'k', 'HH': 'k', 'JH': 'S', 'K': 'k',
                'L': 't', 'M': 'p', 'N': 't', 'NG': 'k', 'P': 'p', 'Q': 'k', 'R': 'r', 'S': 's', 'SH': 'S',
                'T': 't', 'TH': 'T', 'V': 'f', 'W': 'u', 'WH': 'u', 'Y': 'i', 'Z': 's', 'ZH': 'S'}
+
 ipa2vi_dict = {'g': 'k', 'k': 'k', 'k͈': 'k', 'ŋ': 'k', 'h': 'k', 'l': 't', 'n': 't', 't': 't', 't͈': 't', 'm': 'p',
                'p': 'p', 'p_': 'p', 's': 's', 's͈': 's', 't͡ɕ': 'J', 't͡ɕʰ': 'J', 'tʰ': 't', 'pʰ': 'p', 'p͈': 'p',
                't͈͡ɕ': 'J',
-               'a': 'a', 'ja': '',
-               'ʌ': 'E', 'jʌ': '',
-               'o': 'o', 'jo': '',
-               'u': 'u', 'ju': '',
+               'a': 'a', 'ja': 'ia',
+               'ʌ': 'E', 'jʌ': 'E',
+               'o': 'o', 'jo': 'io',
+               'u': 'u', 'ju': 'iu',
                'ɯ': 'i', 'i': 'i',
-               'ɯj': '', 'wi': '', 'je': '', 'jɛ': '', 'wa': '', 'wɛ': '', 'we': '', 'wʌ': '',
+               'ɯj': 'i', 'wi': 'ui', 'je': 'iE', 'jɛ': 'iE', 'wa': 'ua', 'wɛ': 'wE', 'we': 'wE', 'wʌ': 'ua',
                'e': 'E', 'ɛ': 'E', '': ''}
 
 def pho2vi(phoneme_list):
@@ -33,7 +34,10 @@ def pho2vi(phoneme_list):
                 continue
             a = ipa2vi_dict.get(i, None)
             assert a is not None, 'unknown phoneme: %s' % i
-            result.append(a)
+            if len(a) != 1:
+                result.extend(list(a))
+            else:
+                result.append(a)
         return result
     elif arpa2vi_dict.get(re.sub("\d", "", phoneme_list[0]), None) is not None:
         for i in phoneme_list:
@@ -45,7 +49,7 @@ def pho2vi(phoneme_list):
         assert False, 'unknown phoneme: %s' % (phoneme_list[0])
 
 
-# For testing
+# # For testing
 # cmu_d = nltk.corpus.cmudict.dict()
 # entries = nltk.corpus.cmudict.entries()
 # for i in entries[1200:1210]:
