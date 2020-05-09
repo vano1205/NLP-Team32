@@ -74,3 +74,12 @@ def pho2vi(phoneme_list):
 #         print(a, pho2vi([a]))
 #     if b != 'ERROR':
 #         print(b, pho2vi([b]))
+
+# cmu_d = nltk.corpus.cmudict.dict()
+# entries = nltk.corpus.cmudict.entries()
+# f = open("data.txt", 'r')
+# out = open("en_viseme.txt", 'w')
+# for l in f.readlines():
+#     out.write("%s\n" % pho2vi(cmu_d[l.strip()][0]))
+# f.close()
+# out.close()
