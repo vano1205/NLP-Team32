@@ -9,3 +9,4 @@ Translation of scripts and lyrics for automatic lip synchronization
 #### References
 * https://pdfs.semanticscholar.org/9a0b/ac4d9fd4f3f913419fd8d5dd33c39b74cd49.pdf
 * https://en.wikipedia.org/wiki/Korean_phonology
+* https://en.wikipedia.org/wiki/ARPABET
