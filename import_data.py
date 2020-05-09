@@ -31,7 +31,7 @@ f.close()
 
 #if googletrans doesn't work, read kor_data.txt file
 
-#f=open('kor_data.txt', 'r')
+#f=open('dataset/kor_data.txt', 'r')
 #data = f.readlines()
 #i=0
 #for word in data:
