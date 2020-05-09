@@ -8,7 +8,7 @@ engkor=[]
 
 translator = Translator()
 
-f=open('data.txt', 'r')
+f=open('dataset/data.txt', 'r')
 data = f.readlines()
 for word in data:
     eng.append(word.rstrip())

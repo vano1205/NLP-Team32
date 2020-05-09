@@ -17,8 +17,9 @@ kor2ipa_vowels = {'ㅏ': 'a', 'ㅑ': 'ja', 'ㅓ': 'ʌ', 'ㅕ': 'jʌ', 'ㅗ': 'o'
 resultlist=[]
 g2p = G2p()
 
-f = open('kor_data.txt', 'r')
-words = f.read().split('\n')
+kor_data = open('dataset/kor_data.txt', 'r')
+words = kor_data.read().split('\n')
+kor_data.close()
 for word in words:
     # entry is one word
     entry=divideKoreanLetter(g2p(word))
@@ -38,16 +39,12 @@ for word in words:
                 letter[i]=kor2ipa_vowels[atom]
     resultlist.append(entry)
 
-res = []
+korean2phoneme = open('korean2phoneme/korean2phoneme.txt','w')
 for d1 in resultlist:
     list_ = []
     for d2 in d1:
         if len(d2) is 3:
             list_.extend(d2)
-    # while ' ' in list_:
-    #     list_.remove(' ')
-    res.append(list_)
-print(res)
-print(res[29])
+    korean2phoneme.write(str(list_)+'\n')
 
-f.close()
+korean2phoneme.close()
