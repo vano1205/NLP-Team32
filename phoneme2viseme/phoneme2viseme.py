@@ -54,12 +54,3 @@ def pho2vi(phoneme_list):
 # for l in ko_pho:
 #     out2.write("%s\n" % pho2vi(l))
 # out2.close()
-
-print(pho2vi_dict)
-from collections import defaultdict
-aa = defaultdict(list)
-for k, v in pho2vi_dict.items():
-    aa[v].append(k)
-import pprint
-
-pprint.pprint(aa)
