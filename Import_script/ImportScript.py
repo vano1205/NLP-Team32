@@ -6,7 +6,7 @@ from google.cloud import translate_v2 as translate
 import os
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "My First Project-39d227f44795.json"
-text = docx2txt.process("Death Bell Script.docx")
+text = docx2txt.process("Import_script/Death Bell Script.docx")
 #file_one = open("Death Bell_KJE.txt", 'w')
 file_two = open("Death Bell_KOR.txt", 'w', encoding='UTF8')
 file_three = open("Death Bell_ENG.txt", 'w')
@@ -32,7 +32,7 @@ for line in text.splitlines():
 
 for diag in content[2:]:
     if diag == '':
-        continue;
+        continue
     file_two.write(diag+'\n')
     result = client.translate(diag, target_language='en', format_="text")
     file_three.write(result['translatedText']+'\n')
