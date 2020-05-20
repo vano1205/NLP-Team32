@@ -1,8 +1,22 @@
 from nltk.tokenize import sent_tokenize, word_tokenize
 import syllables
 
+def print_paired(stan = [], comp = [], bitmap = []):
+    print_list = []
+    
+    for iter5 in range(len(stan)):
+        word_num = bitmap[iter5]
+        pointer = sum(bitmap[:iter5])
+        print_list.append((stan[iter5], comp[pointer: pointer+word_num]))
+    
+    for a, b in print_list:
+        print (a+' / '+" ".join(b), end=", ")
+
 f_KOR = open("Import_script/Death Bell_KOR.txt", "r")
 f_ENG = open("Import_script/Death Bell_ENG.txt", "r")
+
+f_result = open("pairkoreng/pair_result.txt", 'w',newline="")
+result_pair=[]
 
 sentences_KOR=[]
 sentences_ENG=[]
@@ -18,41 +32,59 @@ for line in f_ENG:
 
 assert (len(sentences_ENG) == len(sentences_KOR))
 
-pairs = [[]]
-
 for iter in range(len(sentences_ENG)):
+    alpha_KOR=[]
+    alpha_ENG=[]
+
     token_KOR = word_tokenize(sentences_KOR[iter])
     token_ENG = word_tokenize(sentences_ENG[iter])
-    pair_num = min(len(token_KOR),len(token_ENG))
-    print(token_KOR)
-    
-    if len(token_KOR) == 1 or len(token_ENG) == 1:
-        pairs[iter].append(token_KOR,token_ENG)
-    
-    elif len(token_KOR) == len(token_ENG):
-        
-        # Each token gets a single word, both in KOR and ENG
-        for iter2 in range(len(token_KOR)):
-            pairs[iter].append(([token_KOR[iter2]], [token_ENG[iter2]]))
-            
-    else:
-        if pair_num == len(token_KOR):
-            standard = token_KOR
-            compare = token_ENG
-        else:
-            standard = token_ENG
-            compare = token_KOR
 
+    for koreanword in token_KOR:
+        # if koreanword.isalpha():
+            alpha_KOR.append(koreanword)
+    
+    for englishword in token_ENG:
+        # if englishword.isalpha():
+            alpha_ENG.append(englishword)
+
+    pair_num = min(len(alpha_KOR),len(alpha_ENG))
+
+    if (len(alpha_KOR) == 1) or (len(alpha_ENG) == 1):
+        pair = (alpha_KOR,alpha_ENG)
+        result_pair.append([pair])
+
+    elif len(alpha_KOR) == len(alpha_ENG):
+        pair=[]
+        # Each token gets a single word, both in KOR and ENG
+        for iter2 in range(len(alpha_KOR)):
+            pair.append(([alpha_KOR[iter2]], [alpha_ENG[iter2]]))
+        result_pair.append(pair)
+        
+    else:
+        korean_syllable_cnt=[]
+        english_syllable_cnt=[]
         standard_syllable_cnt = []
         compare_syllable_cnt = []
+        
+        for koreanword in alpha_KOR:
+            syllable_num=len(koreanword)
+            korean_syllable_cnt.append(syllable_num)
+        
+        for englishword in alpha_ENG:
+            syllable_num=syllables.estimate(englishword)
+            english_syllable_cnt.append(syllable_num)
 
-        for standword in standard:
-            syllable_num=syllables.estimate(standword)
-            standard_syllable_cnt.append(syllable_num)
+        if pair_num == len(alpha_KOR):
+            standard = alpha_KOR
+            compare = alpha_ENG
+            standard_syllable_cnt=korean_syllable_cnt
+            compare_syllable_cnt=english_syllable_cnt
+        else:
+            standard = alpha_ENG
+            compare = alpha_KOR
+            standard_syllable_cnt=english_syllable_cnt
+            compare_syllable_cnt=korean_syllable_cnt
 
-        for cmpword in compare:
-            syllable_num=syllables.estimate(cmpword)
-            compare_syllable_cnt.append(syllable_num)
 
         expected = [0.0]*len(standard)
         bitmap = []
@@ -62,13 +94,97 @@ for iter in range(len(sentences_ENG)):
             expected[iter3] = sum(compare_syllable_cnt)*temp1
 
         
+        save_ptr = 0
         for iter4 in range(len(expected)):
-            save_ptr = 0
+            bitmap.append(0)
+            old_save_ptr = save_ptr
             
-            while round(expected[iter4]) > compare_syllable_cnt[save_ptr]:
-                if save_ptr < len(compare)-(len(standard)-len(bitmap)):
-                    break
+            while True:
+                
+                c1 = len(compare)-save_ptr
+                c2 = len(standard)-len(bitmap)-1
                 save_ptr += 1
+                bitmap[iter4] = bitmap[iter4] + 1
+                
+                if c1 == c2 + 2:
+                    break
+                
+                # print('save ptr: ', save_ptr)
+                # print('c1, c2: ', c1, c2)
+                minus_current = abs(round(expected[iter4])-sum(compare_syllable_cnt[old_save_ptr: save_ptr]))
+                if save_ptr <= len(compare)-1:    
+                    minus_future = abs(round(expected[iter4])-sum(compare_syllable_cnt[old_save_ptr: save_ptr+1]))
+                else:
+                    break
+                if not minus_future < minus_current:
+                    break
+                
+        bitmap[iter4] = len(compare)-sum(bitmap[:iter4])
+        print_paired(standard, compare, bitmap)
+                
+        base=0
+        pair_list=[]
+    
+        for i in range(len(standard)):
+            if standard==alpha_KOR:
+                standard_pair=([standard[i]],compare[base:base+bitmap[i]])
+            else:
+                standard_pair=(compare[base:base+bitmap[i]],[standard[i]])
+            pair_list.append(standard_pair)
+            base+=bitmap[i]
+        result_pair.append(pair_list)
+
+
+for pair in result_pair:
+    f_result.write(str(pair)+'\n')
+                
             
-            bitmap[iter4] = save_ptr
+'''
+elif len(alpha_KOR) == len(alpha_ENG):
+    
+    # Each token gets a single word, both in KOR and ENG
+    for iter2 in range(len(alpha_KOR)):
+        pair = []
+        pair.append(([alpha_KOR[iter2]], [alpha_ENG[iter2]]))
         
+    for a, b in pair:
+        print(str(a)+' / '+str(b), end=", ")
+        # 아 그냥 바로 print 해버리는 건데 문장하나 있으면은
+        # 안녕/ HELLO MY, 내/ NAME, 이름은/ IS MINSU, 민수고/ GO <- pair 4개 이렇게 프린트되는거 dgd거
+'''
+            
+'''
+expected = [12, 8, 6]
+bitmap = []
+compare_syllable_cnt = [7, 3, 2, 6, 5, 4]
+compare = [1, 1, 1, 1, 1, 1]
+standard = [1, 1, 1]
+save_ptr = 0
+for iter4 in range(len(expected)):
+    bitmap.append(0)
+    old_save_ptr = save_ptr
+    
+    while True:
+        
+        c1 = len(compare)-save_ptr
+        c2 = len(standard)-len(bitmap)-1
+        save_ptr += 1
+        bitmap[iter4] = bitmap[iter4] + 1
+            
+        if c1 == c2:
+            break
+        
+        print('save ptr: ', save_ptr)
+        print('c1, c2: ', c1, c2)
+        print('')
+        minus_current = abs(round(expected[iter4])-sum(compare_syllable_cnt[old_save_ptr: save_ptr]))
+        if save_ptr <= len(compare)-1:    
+            minus_future = abs(round(expected[iter4])-sum(compare_syllable_cnt[old_save_ptr: save_ptr+1]))
+        else:
+            break
+        
+        print("mc, mf: ", minus_current, minus_future)
+        if not minus_future < minus_current:
+            break
+print(bitmap)
+'''
