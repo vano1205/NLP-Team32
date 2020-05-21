@@ -8,8 +8,8 @@ import os
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "My First Project-39d227f44795.json"
 text = docx2txt.process("Import_script/Death Bell Script.docx")
 #file_one = open("Death Bell_KJE.txt", 'w')
-file_two = open("Death Bell_KOR.txt", 'w', encoding='UTF8')
-file_three = open("Death Bell_ENG.txt", 'w')
+file_two = open("Import_script/Death Bell_KOR.txt", 'w', encoding='UTF8')
+file_three = open("Import_script/Death Bell_ENG.txt", 'w')
 client = translate.Client()
 
 content = []
