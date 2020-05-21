@@ -1,5 +1,6 @@
 from nltk.tokenize import sent_tokenize, word_tokenize
 import syllables
+import re
 
 def print_paired(stan = [], comp = [], bitmap = []):
     print_list = []
@@ -36,16 +37,19 @@ for iter in range(len(sentences_ENG)):
     alpha_KOR=[]
     alpha_ENG=[]
 
-    token_KOR = word_tokenize(sentences_KOR[iter])
-    token_ENG = word_tokenize(sentences_ENG[iter])
+    pattern='[^\w\s]'
+
+    print(sentences_ENG[iter])
+    resub_KOR=re.sub(pattern=pattern,repl='',string=sentences_KOR[iter])
+    resub_ENG=re.sub(pattern=pattern,repl='',string=sentences_ENG[iter])
+    token_KOR = word_tokenize(resub_KOR)
+    token_ENG = word_tokenize(resub_ENG)
 
     for koreanword in token_KOR:
-        # if koreanword.isalpha():
-            alpha_KOR.append(koreanword)
+        alpha_KOR.append(koreanword)
     
     for englishword in token_ENG:
-        # if englishword.isalpha():
-            alpha_ENG.append(englishword)
+        alpha_ENG.append(englishword)
 
     pair_num = min(len(alpha_KOR),len(alpha_ENG))
 
@@ -137,54 +141,3 @@ for iter in range(len(sentences_ENG)):
 
 for pair in result_pair:
     f_result.write(str(pair)+'\n')
-                
-            
-'''
-elif len(alpha_KOR) == len(alpha_ENG):
-    
-    # Each token gets a single word, both in KOR and ENG
-    for iter2 in range(len(alpha_KOR)):
-        pair = []
-        pair.append(([alpha_KOR[iter2]], [alpha_ENG[iter2]]))
-        
-    for a, b in pair:
-        print(str(a)+' / '+str(b), end=", ")
-        # 아 그냥 바로 print 해버리는 건데 문장하나 있으면은
-        # 안녕/ HELLO MY, 내/ NAME, 이름은/ IS MINSU, 민수고/ GO <- pair 4개 이렇게 프린트되는거 dgd거
-'''
-            
-'''
-expected = [12, 8, 6]
-bitmap = []
-compare_syllable_cnt = [7, 3, 2, 6, 5, 4]
-compare = [1, 1, 1, 1, 1, 1]
-standard = [1, 1, 1]
-save_ptr = 0
-for iter4 in range(len(expected)):
-    bitmap.append(0)
-    old_save_ptr = save_ptr
-    
-    while True:
-        
-        c1 = len(compare)-save_ptr
-        c2 = len(standard)-len(bitmap)-1
-        save_ptr += 1
-        bitmap[iter4] = bitmap[iter4] + 1
-            
-        if c1 == c2:
-            break
-        
-        print('save ptr: ', save_ptr)
-        print('c1, c2: ', c1, c2)
-        print('')
-        minus_current = abs(round(expected[iter4])-sum(compare_syllable_cnt[old_save_ptr: save_ptr]))
-        if save_ptr <= len(compare)-1:    
-            minus_future = abs(round(expected[iter4])-sum(compare_syllable_cnt[old_save_ptr: save_ptr+1]))
-        else:
-            break
-        
-        print("mc, mf: ", minus_current, minus_future)
-        if not minus_future < minus_current:
-            break
-print(bitmap)
-'''
