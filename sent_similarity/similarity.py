@@ -5,6 +5,8 @@ import phoneme2viseme
 from kor_letterdivide import divideKoreanLetter
 from g2pk import G2p
 import re
+import csv
+from os import path
 
 g2p = G2p()
 # 21 visemes based on realistic interaction with social robots via facial expressions ...
@@ -16,45 +18,61 @@ mouthshape_width = {'1': 4, '2': 2, '3': 3, '4': 5, '5': 1, '6': 5, '7': 1, '8':
 mouthshape_height = {'1': 2, '2': 4, '3': 3, '4': 3, '5': 2, '6': 3, '7': 1, '8': 3, '9': 4, 'a': 4,
                      'b': 4, 'c': 1, 'd': 2, 'e': 3, 'f': 2, 'g': 3, 'h': 2, 'i': 1, 'j': 3, 'k': 3, 'l': 1}
 # script2 viseme file
-cmu_d = nltk.corpus.cmudict.dict()
-f = open("../Import_script/Death Bell_ENG.txt", 'r')
-out = open("../sent_similarity/eng_script_viseme.txt", 'w')
-for l in f.readlines():
-    sent_pho = []
-    for w in l.split():
-        phon = cmu_d.get(re.sub(r'[^a-z]+$', '', w.lower()), [None])[0]
-        if phon == None:
-            # sent_pho.append('None')
-            pass
-        else:
-            sent_pho.extend(phoneme2viseme.pho2vi(phon))
-    out.write("%s\n" % ' '.join(sent_pho))
-f.close()
-out.close()
+def eng2viseme(filename):
+    cmu_d = nltk.corpus.cmudict.dict()
+    f = open(filename, 'r')
+    outfile = filename.split('/')[-1].replace('.txt', '_viseme.txt')
+    if path.exists(outfile):
+        out = open(outfile, 'r')
+        return [s.split() for s in out.readlines()]
+    out = open(outfile, 'w', encoding='utf8')
+    result = []
+    for l in f.readlines():
+        sent_pho = []
+        for w in l.split():
+            phon = cmu_d.get(re.sub(r'[^a-z]+$', '', w.lower()), [None])[0]
+            if phon == None:
+                # sent_pho.append('None')
+                pass
+            else:
+                sent_pho.extend(phoneme2viseme.pho2vi(phon))
+        out.write("%s\n" % ' '.join(sent_pho))
+        result.append(sent_pho)
+    f.close()
+    out.close()
+    return result
 
-# f = open("../Import_script/Death Bell_KOR.txt", 'r', encoding='utf8')
-# out = open("../sent_similarity/kor_script_viseme.txt", 'w', encoding='utf8')
-# for l in f.readlines():
-#     sent_pho = []
-#     for w in l.split(): # w is each word in a line
-#         entry = divideKoreanLetter(g2p(w))
-#         for letter in entry:
-#             if len(letter) == 1:
-#                 continue
-#             for i in range(3):
-#                 atom = letter[i]
-#                 if atom in korean2phoneme.kor2ipa_consonant:
-#                     if i == 2:
-#                         index = 1
-#                     elif i == 0:
-#                         index = 0
-#                     letter[i] = korean2phoneme.kor2ipa_consonant[atom][index]
-#                 elif atom in korean2phoneme.kor2ipa_vowels:
-#                     letter[i] = korean2phoneme.kor2ipa_vowels[atom]
-#             sent_pho.extend(phoneme2viseme.pho2vi(letter))
-#     out.write("%s\n" % ' '.join(sent_pho))
-# f.close()
-# out.close()
+def kor2viseme(filename):
+    f = open(filename, 'r', encoding='utf8')
+    outfile = filename.split('/')[-1].replace('.txt', '_viseme.txt')
+    if path.exists(outfile):
+        out = open(outfile, 'r')
+        return [s.split() for s in out.readlines()]
+    out = open(outfile, 'w', encoding='utf8')
+    result = []
+    for l in f.readlines():
+        sent_pho = []
+        for w in l.split(): # w is each word in a line
+            entry = divideKoreanLetter(g2p(w))
+            for letter in entry:
+                if len(letter) == 1:
+                    continue
+                for i in range(3):
+                    atom = letter[i]
+                    if atom in korean2phoneme.kor2ipa_consonant:
+                        if i == 2:
+                            index = 1
+                        elif i == 0:
+                            index = 0
+                        letter[i] = korean2phoneme.kor2ipa_consonant[atom][index]
+                    elif atom in korean2phoneme.kor2ipa_vowels:
+                        letter[i] = korean2phoneme.kor2ipa_vowels[atom]
+                sent_pho.extend(phoneme2viseme.pho2vi(letter))
+        out.write("%s\n" % ' '.join(sent_pho))
+        result.append(sent_pho)
+    f.close()
+    out.close()
+    return result
 
 # giving length penalty
 def compare_viseme(l_vis1, l_vis2):
@@ -64,6 +82,8 @@ def compare_viseme(l_vis1, l_vis2):
     vis2_width = [mouthshape_width[i] for i in l_vis2]
     diff = 0
     shorter = min(len(l_vis1), len(l_vis2))
+    if shorter == 0:
+        return 0
     # diff = sum of Euclidean distance for each visemes
     for i in range(shorter):
         height_diff = (vis1_height[i] - vis2_height[i]) ** 2
@@ -84,49 +104,38 @@ def compare_viseme(l_vis1, l_vis2):
     score = length_penalty * similarity
     return score
 
+def compare_file(filename_en, filename_ko):
+    enfile = open(filename_en, 'r', encoding='utf8')
+    ev_sents = eng2viseme(filename_en) # english text file to list of list of viseme
+    kofile = open(filename_ko, 'r', encoding='utf8')
+    kv_sents = kor2viseme(filename_ko) # korean text file to list of list of viseme
+    outfile = open('comp_%s_%s.csv' %
+                   (filename_en.split('/')[-1].split('.')[0], filename_ko.split('/')[-1].split('.')[0]),
+                   'w', newline='', encoding='utf-8-sig')
+    csvwriter = csv.writer(outfile)
+    sents_en = enfile.readlines() # english text file to list
+    sents_ko = kofile.readlines() # korean text file to list
+    for i in range(min(len(sents_en), len(sents_ko))):
+        print(sents_ko[i], sents_en[i])
+        score = compare_viseme(kv_sents[i], ev_sents[i])
+        csvwriter.writerow([sents_ko[i].strip('\n'), sents_en[i].strip('\n'), "%f" % score])
 
-# arpa2vi_dict = {'AA': '2', 'AE': '1', 'AH': '1', 'AO': '3', 'AW': '9', 'AX': '1', 'AXR': '1', 'AY': 'b',
-#                 'EH': '4', 'ER': '5', 'EY': '4', 'IH': '6', 'IX': '6', 'IY': '6', 'OW': '8', 'OY': 'a',
-#                 'UH': '4', 'UW': '7', 'UX': '7', 'B': 'l', 'CH': 'g', 'D': 'j', 'DH': 'h', 'DX': 'd',
-#                 'EL': 'e', 'EM': 'l', 'EN': 'j', 'F': 'i', 'G': 'k', 'HH': 'c', 'JH': 'g', 'K': 'k',
-#                 'L': 'e', 'M': 'l', 'N': 'j', 'NG': 'k', 'P': 'l', 'Q': 'k', 'R': 'd', 'S': 'f', 'SH': 'g',
-#                 'T': 'j', 'TH': 'h', 'V': 'i', 'W': '7', 'WH': '7', 'Y': '6', 'Z': 'f', 'ZH': 'g'}
-# kor2ipa_consonant = {'ㄱ' : ['g', 'g'], 'ㅋ' : ['k','ERROR'], 'ㅇ' : [' ', 'ŋ'], 'ㅎ' : ['h','ERROR'],
-#                     'ㄹ' : ['l','l'], 'ㄴ': ['n','n'], 'ㄷ':['t','t͈'], 'ㅁ':['m','m'],'ㅂ':['p', 'p_'],
-#                     'ㅅ':['s','ERROR'],'ㅈ':['t͡ɕ','ERROR'],'ㅊ':['t͡ɕʰ','ERROR'],'ㅌ':['tʰ','ERROR'],'ㅍ':['pʰ','ERROR'],
-#                     'ㄲ':['k͈','ERROR'],'ㄸ':['t͈','ERROR'],'ㅃ':['p͈','ERROR'],'ㅆ':['s͈','ERROR'],'ㅉ':['t͈͡ɕ','ERROR']}
-#
-# kor2ipa_vowels = {'ㅏ': 'a', 'ㅑ': 'ja', 'ㅓ': 'ʌ', 'ㅕ': 'jʌ', 'ㅗ': 'o', 'ㅛ': 'jo',
-#                    'ㅜ': 'u', 'ㅠ': 'ju', 'ㅡ': 'ɯ','ㅣ': 'i', 'ㅢ': 'ɯj', 'ㅟ': 'wi',
-#                    'ㅚ': 'e', 'ㅔ': 'e', 'ㅐ': 'ɛ', 'ㅖ': 'je', 'ㅒ': 'jɛ', 'ㅘ': 'wa',
-#                    'ㅙ': 'wɛ', 'ㅞ': 'we', 'ㅝ': 'wʌ'}
-# ipa2vi_dict = {'g': 'k', 'k': 'k', 'k͈': 'k', 'ŋ': 'k', 'h': 'c', 'l': 'j', 'n': 'j', 't': 'j', 't͈': 'j', 'm': 'l',
-#                'p': 'l', 'p_': 'l', 's': 'f', 's͈': 'f', 't͡ɕ': 'g', 't͡ɕʰ': 'g', 'tʰ': 'j', 'pʰ': 'j', 'p͈': 'j',
-#                't͈͡ɕ': 'g',
-#                'a': '2', 'ja': '62',
-#                'ʌ': '4', 'jʌ': '64',
-#                'o': '8', 'jo': '68',
-#                'u': '7', 'ju': '67',
-#                'ɯ': '6', 'i': '6',
-#                'je': '61', 'jɛ': '61',
-#                'ɯj': '6', 'wi': '76', 'wa': '72', 'wɛ': '71', 'we': '71', 'wʌ': '72',
-#                'e': '1', 'ɛ': '1'}
 
-# test for 'cake' and '케이크'
-print(compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
-# test for 'english' and '영국'
-print(compare_viseme(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', 'k', '7', 'k']))
-# test for 'korea' and '고려'
-print(compare_viseme(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
-# test for 'dream' and '꿈'
-print(compare_viseme(['j', 'd', '6', 'l'], ['k', '7', 'l']))
-# test for 'mango' and '망고'
-print(compare_viseme(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
-# test for 'desk' and '책상'
-print(compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+print("test for 'cake' and '케이크'",
+      compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
+print("test for 'english' and '영어'",
+      compare_viseme(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
+print("test for 'korea' and '고려'",
+      compare_viseme(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
+print("test for 'dream' and '꿈'",
+      compare_viseme(['j', 'd', '6', 'l'], ['k', '7', 'l']))
+print("test for 'mango' and '망고'",
+      compare_viseme(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+print("test for 'desk' and '책상'",
+      compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
 # print(compare_viseme(['k', '4'], ['k', 'k']))
 # print(compare_viseme(['k', '4','k','4'], ['k', 'k','k','k']))
-
+compare_file("../Import_script/Death Bell_ENG.txt", "../Import_script/Death Bell_KOR.txt")
 
 # matching length
 def compare_viseme2(l_vis1, l_vis2):
