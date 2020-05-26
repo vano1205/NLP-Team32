@@ -1,5 +1,12 @@
 import math
+import nltk
+import korean2phoneme
+import phoneme2viseme
+from kor_letterdivide import divideKoreanLetter
+from g2pk import G2p
+import re
 
+g2p = G2p()
 # 21 visemes based on realistic interaction with social robots via facial expressions ...
 visemes = {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'}
 
@@ -8,9 +15,48 @@ mouthshape_width = {'1': 4, '2': 2, '3': 3, '4': 5, '5': 1, '6': 5, '7': 1, '8':
                     'b': 5, 'c': 2, 'd': 1, 'e': 4, 'f': 4, 'g': 3, 'h': 4, 'i': 4, 'j': 5, 'k': 4, 'l': 2}
 mouthshape_height = {'1': 2, '2': 4, '3': 3, '4': 3, '5': 2, '6': 3, '7': 1, '8': 3, '9': 4, 'a': 4,
                      'b': 4, 'c': 1, 'd': 2, 'e': 3, 'f': 2, 'g': 3, 'h': 2, 'i': 1, 'j': 3, 'k': 3, 'l': 1}
+# script2 viseme file
+cmu_d = nltk.corpus.cmudict.dict()
+f = open("../Import_script/Death Bell_ENG.txt", 'r')
+out = open("../sent_similarity/eng_script_viseme.txt", 'w')
+for l in f.readlines():
+    sent_pho = []
+    for w in l.split():
+        phon = cmu_d.get(re.sub(r'[^a-z]+$', '', w.lower()), [None])[0]
+        if phon == None:
+            # sent_pho.append('None')
+            pass
+        else:
+            sent_pho.extend(phoneme2viseme.pho2vi(phon))
+    out.write("%s\n" % ' '.join(sent_pho))
+f.close()
+out.close()
 
+# f = open("../Import_script/Death Bell_KOR.txt", 'r', encoding='utf8')
+# out = open("../sent_similarity/kor_script_viseme.txt", 'w', encoding='utf8')
+# for l in f.readlines():
+#     sent_pho = []
+#     for w in l.split(): # w is each word in a line
+#         entry = divideKoreanLetter(g2p(w))
+#         for letter in entry:
+#             if len(letter) == 1:
+#                 continue
+#             for i in range(3):
+#                 atom = letter[i]
+#                 if atom in korean2phoneme.kor2ipa_consonant:
+#                     if i == 2:
+#                         index = 1
+#                     elif i == 0:
+#                         index = 0
+#                     letter[i] = korean2phoneme.kor2ipa_consonant[atom][index]
+#                 elif atom in korean2phoneme.kor2ipa_vowels:
+#                     letter[i] = korean2phoneme.kor2ipa_vowels[atom]
+#             sent_pho.extend(phoneme2viseme.pho2vi(letter))
+#     out.write("%s\n" % ' '.join(sent_pho))
+# f.close()
+# out.close()
 
-# not considering the white space
+# giving length penalty
 def compare_viseme(l_vis1, l_vis2):
     vis1_height = [mouthshape_height[i] for i in l_vis1]
     vis1_width = [mouthshape_width[i] for i in l_vis1]
@@ -76,3 +122,12 @@ print(compare_viseme(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
 print(compare_viseme(['j', 'd', '6', 'l'], ['k', '7', 'l']))
 # test for 'mango' and '망고'
 print(compare_viseme(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+# test for 'desk' and '책상'
+print(compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+# print(compare_viseme(['k', '4'], ['k', 'k']))
+# print(compare_viseme(['k', '4','k','4'], ['k', 'k','k','k']))
+
+
+# matching length
+def compare_viseme2(l_vis1, l_vis2):
+    pass
