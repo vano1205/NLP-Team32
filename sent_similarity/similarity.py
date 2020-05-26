@@ -116,7 +116,6 @@ def compare_file(filename_en, filename_ko):
     sents_en = enfile.readlines() # english text file to list
     sents_ko = kofile.readlines() # korean text file to list
     for i in range(min(len(sents_en), len(sents_ko))):
-        print(sents_ko[i], sents_en[i])
         score = compare_viseme(kv_sents[i], ev_sents[i])
         csvwriter.writerow([sents_ko[i].strip('\n'), sents_en[i].strip('\n'), "%f" % score])
 
