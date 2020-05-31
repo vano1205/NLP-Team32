@@ -17,10 +17,7 @@ kor2ipa_vowels = {'ㅏ': 'a', 'ㅑ': 'ja', 'ㅓ': 'ʌ', 'ㅕ': 'jʌ', 'ㅗ': 'o'
 resultlist=[]
 g2p = G2p()
 
-kor_data = open('../dataset/kor_data.txt', 'r', encoding='utf8')
-words = kor_data.read().split('\n')
-kor_data.close()
-for word in words:
+def kor2phon(word):
     # entry is one word
     entry=divideKoreanLetter(g2p(word))
     # space ignored in a word
@@ -37,14 +34,19 @@ for word in words:
                 letter[i]=kor2ipa_consonant[atom][index]
             elif atom in kor2ipa_vowels:
                 letter[i]=kor2ipa_vowels[atom]
-    resultlist.append(entry)
-
-korean2phoneme = open('../korean2phoneme/korean2phoneme.txt','w', encoding='utf8')
-for d1 in resultlist:
-    list_ = []
-    for d2 in d1:
+    list_=[]
+    for d2 in entry:
         if len(d2) is 3:
             list_.extend(d2)
-    korean2phoneme.write(str(list_)+'\n')
+    return list_
+
+kor_data = open('dataset/kor_data.txt', 'r', encoding='utf8')
+korean2phoneme = open('korean2phoneme/korean2phoneme.txt','w', encoding='utf8')
+
+words = kor_data.read().split('\n')
+kor_data.close()
+for word in words:
+    entry=kor2phon(word)
+    korean2phoneme.write(str(entry)+'\n')
 
 korean2phoneme.close()

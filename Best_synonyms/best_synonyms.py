@@ -1,14 +1,18 @@
 from nltk import *
+import sys 
+import os
+sys.path.append(os.path.abspath("pairkoreng"))
+sys.path.append(os.path.abspath("phoneme2viseme"))
+sys.path.append(os.path.abspath("korean2phoneme"))
 import pairkoreng
-import korean2phoneme_updated
+from korean2phoneme import kor2phon
 from phoneme2viseme import pho2vi
-from korean2phoneme_updated import kor2phon
+
 import Evaluate_updated
 from Evaluate_updated import viseme_set_similarity
 from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict
 import itertools
-import sys
 
 result_pair = pairkoreng.result_pair
 viseme_list = []
@@ -129,12 +133,12 @@ for word_pair, vis_pair in zip(result_pair, viseme_list):
     b=b+1
 
 
-#f1 = open('best_pairs.txt','w')
-#for pair in best_pairs:
-#    f1.write(str(pair)+'\n')
-#f1.close()
+f1 = open('Best_synonyms/best_pairs.txt','w')
+for pair in best_pairs:
+   f1.write(str(pair)+'\n')
+f1.close()
 
-#f2 = open('best_viseme_pairs.txt','w')
-#for pair in best_viseme_list:
-#    f2.write(str(pair)+'\n')
-#f2.close()
+f2 = open('Best_synonyms/best_viseme_pairs.txt','w')
+for pair in best_viseme_list:
+   f2.write(str(pair)+'\n')
+f2.close()
