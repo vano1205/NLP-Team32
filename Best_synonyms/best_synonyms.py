@@ -1,9 +1,9 @@
 from nltk import *
-import sys 
+import sys
 import os
-sys.path.append(os.path.abspath("pairkoreng"))
-sys.path.append(os.path.abspath("phoneme2viseme"))
-sys.path.append(os.path.abspath("korean2phoneme"))
+sys.path.append(os.path.abspath("../pairkoreng"))
+sys.path.append(os.path.abspath("../phoneme2viseme"))
+sys.path.append(os.path.abspath("../korean2phoneme"))
 import pairkoreng
 from korean2phoneme import kor2phon
 from phoneme2viseme import pho2vi
@@ -65,11 +65,11 @@ def viseme(word, language):
             return pho2vi(phons)
 
         except:
-            #print("\n",word, "is not in cmudict\n")
+            #print(word, "is not in cmudict\n")
             return ""
     else:
         return pho2vi(kor2phon(word))
-        #return " "
+        return " "
 
 #Create a list of visemes in the same format as the list of English-Korean word pairs
 def set_viseme_list(pair_list):
@@ -99,7 +99,7 @@ def best_word(eng_word, eng_vis, ko_vis):
 
     for syn in wn.synsets(eng_word):
         for l in syn.lemmas():
-            if l.name() != eng_word:
+            if l.name() != eng_word and l.name() != "group_a" and l.name() != "information_technology":
                 #compare english synonym and korean word
                 vis = viseme(l.name(), "en")
                 tmp = viseme_set_similarity(vis, ko_vis)
@@ -122,8 +122,8 @@ for word_pair, vis_pair in zip(result_pair, viseme_list):
     while i < len(word_pair):
         j=0
         while j < len(word_pair[i][1]):
-            #best_word(english word, english visemes list, korean visemes list)
-            best = best_word(word_pair[i][1][j], vis_pair[i][1][j], vis_pair[i][0][0])
+            if (len(vis_pair[i][0]) != 0):
+                best = best_word(word_pair[i][1][j], vis_pair[i][1][j], vis_pair[i][0])
             #if a better synonym is found:
             if best[0] != word_pair[i][1][j]:
                 best_pairs[b][i][1][j] = best[0]
@@ -133,12 +133,12 @@ for word_pair, vis_pair in zip(result_pair, viseme_list):
     b=b+1
 
 
-f1 = open('Best_synonyms/best_pairs.txt','w')
+f1 = open('best_pairs.txt','w')
 for pair in best_pairs:
    f1.write(str(pair)+'\n')
 f1.close()
 
-f2 = open('Best_synonyms/best_viseme_pairs.txt','w')
+f2 = open('best_viseme_pairs.txt','w')
 for pair in best_viseme_list:
    f2.write(str(pair)+'\n')
 f2.close()
