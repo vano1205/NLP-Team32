@@ -8,8 +8,12 @@ import pairkoreng
 from korean2phoneme import kor2phon
 from phoneme2viseme import pho2vi
 
-import Evaluate_updated
-from Evaluate_updated import viseme_set_similarity
+import similarity
+from similarity import compare_viseme
+
+#import Evaluate_updated
+#from Evaluate_updated import viseme_set_similarity
+
 from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict
 import itertools
@@ -93,7 +97,7 @@ def set_viseme_list(pair_list):
 def best_word(eng_word, eng_vis, ko_vis):
     """returns a synonym of eng_word with better visemes similarity (if it exists)"""
 
-    cur = viseme_set_similarity(eng_vis, ko_vis)
+    cur = compare_viseme(eng_vis, ko_vis)
     res_word = eng_word
     res_vis = eng_vis
 
@@ -102,7 +106,7 @@ def best_word(eng_word, eng_vis, ko_vis):
             if l.name() != eng_word and l.name() != "group_a" and l.name() != "information_technology":
                 #compare english synonym and korean word
                 vis = viseme(l.name(), "en")
-                tmp = viseme_set_similarity(vis, ko_vis)
+                tmp = compare_viseme(vis, ko_vis)
                 if tmp > cur:
                     cur = tmp
                     res_word = l.name()
