@@ -4,6 +4,7 @@ import os
 sys.path.append(os.path.abspath("../pairkoreng"))
 sys.path.append(os.path.abspath("../phoneme2viseme"))
 sys.path.append(os.path.abspath("../korean2phoneme"))
+sys.path.append(os.path.abspath("../sent_similarity"))
 import pairkoreng
 from korean2phoneme import kor2phon
 from phoneme2viseme import pho2vi
