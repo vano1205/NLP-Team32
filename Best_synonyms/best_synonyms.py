@@ -5,11 +5,10 @@ sys.path.append(os.path.abspath("../pairkoreng"))
 sys.path.append(os.path.abspath("../phoneme2viseme"))
 sys.path.append(os.path.abspath("../korean2phoneme"))
 sys.path.append(os.path.abspath("../sent_similarity"))
-import pairkoreng
+
 from korean2phoneme import kor2phon
 from phoneme2viseme import pho2vi
 
-import similarity
 from similarity import compare_viseme
 
 #import Evaluate_updated
@@ -19,9 +18,6 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict
 import itertools
 
-result_pair = pairkoreng.result_pair
-viseme_list = []
-best_viseme_list = []
 cmu_d = cmudict.dict()
 
 
@@ -104,46 +100,56 @@ def best_word(eng_word, eng_vis, ko_vis):
 
     for syn in wn.synsets(eng_word):
         for l in syn.lemmas():
-            if l.name() != eng_word and l.name() != "group_a" and l.name() != "information_technology":
+            if l.name() != eng_word and (l.name()).find("type_") == -1 and  (l.name()).find("group_") == -1 and l.name() != "information_technology":
                 #compare english synonym and korean word
                 vis = viseme(l.name(), "en")
                 tmp = compare_viseme(vis, ko_vis)
                 if tmp > cur:
                     cur = tmp
-                    res_word = l.name()
+                    res_word = (l.name()).replace('_', ' ')
                     res_vis = vis
 
     return (res_word, res_vis)
 
 
-viseme_list = set_viseme_list(result_pair)
-best_viseme_list = viseme_list
-best_pairs = result_pair
+def find_best_syn(file_en, file_ko, pairs):
+    result_pair = pairs
+    viseme_list = []
+    best_viseme_list = []
+
+    viseme_list = set_viseme_list(result_pair)
+    best_viseme_list = viseme_list
+    best_pairs = result_pair
+
+    b=0
+    for word_pair, vis_pair in zip(result_pair, viseme_list):
+        i=0
+        while i < len(word_pair):
+            j=0
+            while j < len(word_pair[i][1]):
+                if (len(vis_pair[i][0]) != 0):
+                    best = best_word(word_pair[i][1][j], vis_pair[i][1][j], vis_pair[i][0])
+                #if a better synonym is found:
+                if best[0] != word_pair[i][1][j]:
+                    best_pairs[b][i][1][j] = best[0]
+                    best_viseme_list[b][i][1][j] = best[1]
+                j=j+1
+            i=i+1
+        b=b+1
 
 
-b=0
-for word_pair, vis_pair in zip(result_pair, viseme_list):
-    i=0
-    while i < len(word_pair):
-        j=0
-        while j < len(word_pair[i][1]):
-            if (len(vis_pair[i][0]) != 0):
-                best = best_word(word_pair[i][1][j], vis_pair[i][1][j], vis_pair[i][0])
-            #if a better synonym is found:
-            if best[0] != word_pair[i][1][j]:
-                best_pairs[b][i][1][j] = best[0]
-                best_viseme_list[b][i][1][j] = best[1]
-            j=j+1
-        i=i+1
-    b=b+1
+    f1 = open("Best_synonyms/best_pairs_%s_%s.txt" %
+            (file_en.split('/')[-1].split('.')[0], file_ko.split('/')[-1].split('.')[0])
+            , 'w',newline="")
+    for pair in best_pairs:
+        f1.write(str(pair)+'\n')
+    f1.close()
 
+    f2 = open("Best_synonyms/best_viseme_pairs_%s_%s.txt" %
+            (file_en.split('/')[-1].split('.')[0], file_ko.split('/')[-1].split('.')[0])
+            , 'w',newline="")
+    for pair in best_viseme_list:
+        f2.write(str(pair)+'\n')
+    f2.close()
 
-f1 = open('best_pairs.txt','w')
-for pair in best_pairs:
-   f1.write(str(pair)+'\n')
-f1.close()
-
-f2 = open('best_viseme_pairs.txt','w')
-for pair in best_viseme_list:
-   f2.write(str(pair)+'\n')
-f2.close()
+    return best_pairs
