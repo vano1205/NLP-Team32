@@ -1,6 +1,7 @@
 from kor_letterdivide import divideKoreanLetter
 from g2pk import G2p
 
+
 # 7종성법에 의거하여 ㄱㄴㄷㄹㅁㅂㅇ 이외의 자음은 받침으로 올 수 없다. -> ERROR 처리
 # first element is for consonant at upper part of the letter
 # second element is for consonant at lower part of the letter
@@ -40,8 +41,8 @@ def kor2phon(word):
             list_.extend(d2)
     return list_
 
-kor_data = open('dataset/kor_data.txt', 'r', encoding='utf8')
-korean2phoneme = open('korean2phoneme/korean2phoneme.txt','w', encoding='utf8')
+kor_data = open('../dataset/kor_data.txt', 'r', encoding='utf8')
+korean2phoneme = open('../korean2phoneme/korean2phoneme.txt','w', encoding='utf8')
 
 words = kor_data.read().split('\n')
 kor_data.close()

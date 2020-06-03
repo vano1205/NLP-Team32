@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.abspath("korean2phoneme"))
 sys.path.append(os.path.abspath("phoneme2viseme"))
 from kor_letterdivide import divideKoreanLetter
-import korean2phoneme
+from korean2phoneme import kor2ipa_consonant, kor2ipa_vowels
 import phoneme2viseme
 
 from g2pk import G2p
@@ -26,7 +26,7 @@ mouthshape_height = {'1': 2, '2': 4, '3': 3, '4': 3, '5': 2, '6': 3, '7': 1, '8'
 def eng2viseme(filename):
     cmu_d = nltk.corpus.cmudict.dict()
     f = open(filename, 'r')
-    outfile = 'sent_similarity/'+filename.split('/')[-1].replace('.txt', '_viseme.txt')
+    outfile = '../sent_similarity/'+filename.split('/')[-1].replace('.txt', '_viseme.txt')
     if path.exists(outfile):
         out = open(outfile, 'r')
         return [s.split() for s in out.readlines()]
@@ -49,7 +49,7 @@ def eng2viseme(filename):
 
 def kor2viseme(filename):
     f = open(filename, 'r', encoding='utf8')
-    outfile = 'sent_similarity/'+filename.split('/')[-1].replace('.txt', '_viseme.txt')
+    outfile = '../sent_similarity/'+filename.split('/')[-1].replace('.txt', '_viseme.txt')
     if path.exists(outfile):
         out = open(outfile, 'r')
         return [s.split() for s in out.readlines()]
@@ -64,14 +64,14 @@ def kor2viseme(filename):
                     continue
                 for i in range(3):
                     atom = letter[i]
-                    if atom in korean2phoneme.kor2ipa_consonant:
+                    if atom in kor2ipa_consonant:
                         if i == 2:
                             index = 1
                         elif i == 0:
                             index = 0
-                        letter[i] = korean2phoneme.kor2ipa_consonant[atom][index]
-                    elif atom in korean2phoneme.kor2ipa_vowels:
-                        letter[i] = korean2phoneme.kor2ipa_vowels[atom]
+                        letter[i] = kor2ipa_consonant[atom][index]
+                    elif atom in kor2ipa_vowels:
+                        letter[i] = kor2ipa_vowels[atom]
                 sent_pho.extend(phoneme2viseme.pho2vi(letter))
         out.write("%s\n" % ' '.join(sent_pho))
         result.append(sent_pho)
@@ -114,7 +114,7 @@ def compare_file(filename_en, filename_ko):
     ev_sents = eng2viseme(filename_en) # english text file to list of list of viseme
     kofile = open(filename_ko, 'r', encoding='utf8')
     kv_sents = kor2viseme(filename_ko) # korean text file to list of list of viseme
-    outfile = open('sent_similarity/comp_%s_%s.csv' %
+    outfile = open('../sent_similarity/comp_%s_%s.csv' %
                    (filename_en.split('/')[-1].split('.')[0], filename_ko.split('/')[-1].split('.')[0]),
                    'w', newline='', encoding='utf-8-sig')
     csvwriter = csv.writer(outfile)
@@ -139,7 +139,8 @@ print("test for 'desk' and '책상'",
       compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
 # print(compare_viseme(['k', '4'], ['k', 'k']))
 # print(compare_viseme(['k', '4','k','4'], ['k', 'k','k','k']))
-compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
+compare_file("../Import_script/Death Bell_ENG.txt", "../Import_script/Death Bell_KOR.txt")
+compare_file("../Import_script/Bleak Night_ENG.txt", "../Import_script/Bleak Night_KOR.txt")
 
 # matching length
 def compare_viseme2(l_vis1, l_vis2):
