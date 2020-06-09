@@ -41,8 +41,8 @@ def kor2phon(word):
             list_.extend(d2)
     return list_
 
-kor_data = open('../dataset/kor_data.txt', 'r', encoding='utf8')
-korean2phoneme = open('../korean2phoneme/korean2phoneme.txt','w', encoding='utf8')
+kor_data = open('dataset/kor_data.txt', 'r', encoding='utf8')
+korean2phoneme = open('korean2phoneme/korean2phoneme.txt','w', encoding='utf8')
 
 words = kor_data.read().split('\n')
 kor_data.close()
