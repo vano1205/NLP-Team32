@@ -55,7 +55,6 @@ def eng2viseme(filename):
 
 def kor2viseme(filename):
     f = open(filename, 'r', encoding='utf8')
-
     outfile = 'sent_similarity/' + filename.split('/')[-1].replace('.txt', '_viseme.txt')
 
     if path.exists(outfile):
@@ -196,7 +195,6 @@ def compare_file(filename_en, filename_ko):
     enfile = open(filename_en, 'r', encoding='utf8')
     ev_sents = eng2viseme(filename_en)  # english text file to list of list of viseme
     kofile = open(filename_ko, 'r', encoding='utf8')
-
     kv_sents = kor2viseme(filename_ko)  # korean text file to list of list of viseme
 
     outfile = open('sent_similarity/comp_%s_%s.csv' %
