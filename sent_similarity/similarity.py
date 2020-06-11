@@ -2,7 +2,6 @@ import math
 import nltk
 import sys
 import os
-import pronouncing
 from g2p_en import G2p as G2p_en
 
 sys.path.append(os.path.abspath("korean2phoneme"))
