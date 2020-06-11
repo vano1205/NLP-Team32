@@ -10,17 +10,6 @@ sys.path.append(os.path.abspath("phoneme2viseme"))
 sys.path.append(os.path.abspath("korean2phoneme"))
 sys.path.append(os.path.abspath("sent_similarity"))
 
-# SH & JS section 01. needs this path >_0.
-sys.path.append(os.path.abspath("Import_Script"))
-f = open("Import_Script/Death Bell_KOR.txt", "r")
-kor_script = f.read().split('\n')
-f.close()
-
-f = open("Import_Script/Death Bell_ENG.txt", "r")
-eng_script = f.read().split('\n')
-f.close()
-# SH & JS section 01. end.
-
 import pairkoreng
 
 from korean2phoneme import kor2phon
@@ -108,31 +97,8 @@ def set_viseme_list(pair_list):
         list.append(tmp)
     return list
 
-# Implement compare length. (The secondary criteria for choosing synonyms.)
-def compare_length (eng_word, synonym, idx):
-    """ Returns the score of the sentence[idx] including a particular synonym. The score gets higher as the length of 
-    the sentences's syllables gets similar to the original sentence's syllable length. """
-    kor_original_sentence = kor_script[idx]
-    eng_original_sentence = eng_script[idx]
-    eng_synonym_sentence = eng_original_sentence.replace(eng_word, synonym)
-    syllable_num = -1
-
-    kor_token_orginial_sentence = word_tokenize(kor_original_sentence)
-    total_kor_orginial = 0
-    for word in kor_token_orginial_sentence:
-        syllable_num = syllables.estimate(word)
-        total_kor_orginial+=syllable_num
-        
-    eng_token_synonym_sentence = word_tokenize(eng_synonym_sentence)
-    total_eng_synonym = 0
-    for word in eng_token_synonym_sentence:
-        syllable_num = syllables.estimate(word)
-        total_eng_synonym += syllable_num
-        
-    return min(total_kor_orginial, total_eng_synonym)/max(total_kor_orginial, total_eng_synonym)
-
 #Find best synonym in terms of visemes similarity
-def best_word(eng_word, eng_vis, ko_vis, sentence_idx):
+def best_word(eng_word, eng_vis, ko_vis):
     """returns a synonym of eng_word with better visemes similarity (if it exists)"""
 
     cur = compare_viseme(eng_vis, ko_vis)
@@ -144,9 +110,6 @@ def best_word(eng_word, eng_vis, ko_vis, sentence_idx):
             if l.name() != eng_word and (l.name()).find("type_") == -1 and  (l.name()).find("group_") == -1 and l.name() != "information_technology":
                 #compare english synonym and korean word
                 vis = viseme(l.name(), "en")
-                length_score=compare_length(eng_word,l.name(),sentence_idx)
-                print(sentence_idx,"sentence index !\n")
-                print(length_score,"length score!\n")
                 tmp = compare_viseme(vis, ko_vis)
                 if tmp > cur:
                     cur = tmp
@@ -175,7 +138,7 @@ for word_pair, vis_pair in zip(result_pair, viseme_list):
         j=0
         while j < len(word_pair[i][1]):
             if (len(vis_pair[i][0]) != 0):
-                best = best_word(word_pair[i][1][j], vis_pair[i][1][j], vis_pair[i][0],b)
+                best = best_word(word_pair[i][1][j], vis_pair[i][1][j], vis_pair[i][0])
             #if a better synonym is found:
             if best[0] != word_pair[i][1][j]:
                 best_pairs[b][i][1][j] = best[0]
