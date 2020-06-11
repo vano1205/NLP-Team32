@@ -2,6 +2,8 @@ import math
 import nltk
 import sys
 import os
+import pronouncing
+from g2p_en import G2p as G2p_en
 
 sys.path.append(os.path.abspath("korean2phoneme"))
 sys.path.append(os.path.abspath("phoneme2viseme"))
@@ -27,22 +29,24 @@ mouthshape_height = {'1': 2, '2': 4, '3': 3, '4': 3, '5': 2, '6': 3, '7': 1, '8'
 
 # script2 viseme file
 def eng2viseme(filename):
+    g2p_en = G2p_en()
     cmu_d = nltk.corpus.cmudict.dict()
     f = open(filename, 'r')
 
     outfile = 'sent_similarity/' + filename.split('/')[-1].replace('.txt', '_viseme.txt')
 
-    if path.exists(outfile):
-        out = open(outfile, 'r')
-        return [s.split() for s in out.readlines()]
+    # if path.exists(outfile):
+    #     out = open(outfile, 'r')
+    #     return [s.split() for s in out.readlines()]
     out = open(outfile, 'w', encoding='utf8')
     result = []
     for l in f.readlines():
         sent_pho = []
         for w in l.split():
-            phon = cmu_d.get(re.sub(r'[^a-z]+$', '', w.lower()), [None])[0]
+            phon = cmu_d.get(re.sub(r'[^a-z]+', '', w.lower()), [None])[0]
             if phon == None:
-                # sent_pho.append('None')
+                phon = g2p_en(re.sub(r'[^a-z]+', '', w.lower()))
+                sent_pho.extend(phoneme2viseme.pho2vi(phon))
                 pass
             else:
                 sent_pho.extend(phoneme2viseme.pho2vi(phon))
@@ -57,9 +61,9 @@ def kor2viseme(filename):
     f = open(filename, 'r', encoding='utf8')
     outfile = 'sent_similarity/' + filename.split('/')[-1].replace('.txt', '_viseme.txt')
 
-    if path.exists(outfile):
-        out = open(outfile, 'r')
-        return [s.split() for s in out.readlines()]
+    # if path.exists(outfile):
+    #     out = open(outfile, 'r')
+    #     return [s.split() for s in out.readlines()]
     out = open(outfile, 'w', encoding='utf8')
     result = []
     for l in f.readlines():
@@ -127,7 +131,6 @@ def compare_viseme2(l_vis1, l_vis2):
         if lcm % a == 0 and lcm % b == 0:
             break
         lcm += 1
-
     l_vis1_s = []
     l_vis2_s = []
     for vis in l_vis1:
@@ -208,70 +211,70 @@ def compare_file(filename_en, filename_ko):
         csvwriter.writerow([sents_ko[i].strip('\n'), sents_en[i].strip('\n'), "%f" % score])
 
 
-print("test for 'cake' and '케이크'",
-      compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
-print("test2 for 'cake' and '케이크'",
-      compare_viseme2(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
-print("test3 for 'cake' and '케이크'",
-      compare_viseme3(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
-print()
+# print("test for 'cake' and '케이크'",
+#       compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
+# print("test2 for 'cake' and '케이크'",
+#       compare_viseme2(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
+# print("test3 for 'cake' and '케이크'",
+#       compare_viseme3(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
+# print()
+#
+# print("test for 'english' and '영어'",
+#       compare_viseme(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
+# print("test2 for 'english' and '영어'",
+#       compare_viseme2(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
+# print("test3 for 'english' and '영어'",
+#       compare_viseme3(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
+# print()
+#
+# print("test for 'korea' and '고려'",
+#       compare_viseme(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
+# print("test2 for 'korea' and '고려'",
+#       compare_viseme2(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
+# print("test3 for 'korea' and '고려'",
+#       compare_viseme3(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
+# print()
+#
+# print("test for 'dream' and '꿈'",
+#       compare_viseme(['j', 'd', '6', 'l'], ['k', '7', 'l']))
+# print("test2 for 'dream' and '꿈'",
+#       compare_viseme2(['j', 'd', '6', 'l'], ['k', '7', 'l']))
+# print("test3 for 'dream' and '꿈'",
+#       compare_viseme3(['j', 'd', '6', 'l'], ['k', '7', 'l']))
+# print()
+#
+# print("test for 'mango' and '망고'",
+#       compare_viseme(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+# print("test2 for 'mango' and '망고'",
+#       compare_viseme2(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+# print("test3 for 'mango' and '망고'",
+#       compare_viseme3(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+# print()
+#
+# print("test for 'desk' and '책상'",
+#       compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+# print("test2 for 'desk' and '책상'",
+#       compare_viseme2(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+# print("test3 for 'desk' and '책상'",
+#       compare_viseme3(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+# print()
+#
+# print("test for '키' and 'key'",
+#       compare_viseme(['k', 'i'], ['k', 'i']))
+# print("test2 for '키' and 'key'",
+#       compare_viseme2(['k', 'i'], ['k', 'i']))
+# print("test3 for '키' and 'key'",
+#       compare_viseme3(['k', 'i'], ['k', 'i']))
+# print()
+#
+# print("test for 'ah' and 'ah ah ah ah'",
+#       compare_viseme(['1'], ['1', '1', '1', '1']))
+# print("test2 for 'ah' and 'ah ah ah ah'",
+#       compare_viseme2(['1'], ['1', '1', '1', '1']))
+# print("test3 for 'ah' and 'ah ah ah ah'",
+#       compare_viseme3(['1'], ['1', '1', '1', '1']))
+# print()
 
-print("test for 'english' and '영어'",
-      compare_viseme(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
-print("test2 for 'english' and '영어'",
-      compare_viseme2(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
-print("test3 for 'english' and '영어'",
-      compare_viseme3(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
-print()
-
-print("test for 'korea' and '고려'",
-      compare_viseme(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
-print("test2 for 'korea' and '고려'",
-      compare_viseme2(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
-print("test3 for 'korea' and '고려'",
-      compare_viseme3(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
-print()
-
-print("test for 'dream' and '꿈'",
-      compare_viseme(['j', 'd', '6', 'l'], ['k', '7', 'l']))
-print("test2 for 'dream' and '꿈'",
-      compare_viseme2(['j', 'd', '6', 'l'], ['k', '7', 'l']))
-print("test3 for 'dream' and '꿈'",
-      compare_viseme3(['j', 'd', '6', 'l'], ['k', '7', 'l']))
-print()
-
-print("test for 'mango' and '망고'",
-      compare_viseme(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
-print("test2 for 'mango' and '망고'",
-      compare_viseme2(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
-print("test3 for 'mango' and '망고'",
-      compare_viseme3(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
-print()
-
-print("test for 'desk' and '책상'",
-      compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
-print("test2 for 'desk' and '책상'",
-      compare_viseme2(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
-print("test3 for 'desk' and '책상'",
-      compare_viseme3(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
-print()
-
-print("test for '키' and 'key'",
-      compare_viseme(['k', 'i'], ['k', 'i']))
-print("test2 for '키' and 'key'",
-      compare_viseme2(['k', 'i'], ['k', 'i']))
-print("test3 for '키' and 'key'",
-      compare_viseme3(['k', 'i'], ['k', 'i']))
-print()
-
-print("test for 'ah' and 'ah ah ah ah'",
-      compare_viseme(['1'], ['1', '1', '1', '1']))
-print("test2 for 'ah' and 'ah ah ah ah'",
-      compare_viseme2(['1'], ['1', '1', '1', '1']))
-print("test3 for 'ah' and 'ah ah ah ah'",
-      compare_viseme3(['1'], ['1', '1', '1', '1']))
-print()
-
-# compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
-# compare_file("Import_script/Bleak Night_ENG.txt", "Import_script/Bleak Night_KOR.txt")
+compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
+compare_file("Import_script/Bleak Night_ENG.txt", "Import_script/Bleak Night_KOR.txt")
 
