@@ -1,7 +1,8 @@
 import math
 import nltk
-import sys 
+import sys
 import os
+
 sys.path.append(os.path.abspath("korean2phoneme"))
 sys.path.append(os.path.abspath("phoneme2viseme"))
 from kor_letterdivide import divideKoreanLetter
@@ -12,7 +13,7 @@ from g2pk import G2p
 import re
 import csv
 from os import path
-
+from pprint import pprint
 g2p = G2p()
 # 21 visemes based on realistic interaction with social robots via facial expressions ...
 visemes = {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'}
@@ -22,11 +23,15 @@ mouthshape_width = {'1': 4, '2': 2, '3': 3, '4': 5, '5': 1, '6': 5, '7': 1, '8':
                     'b': 5, 'c': 2, 'd': 1, 'e': 4, 'f': 4, 'g': 3, 'h': 4, 'i': 4, 'j': 5, 'k': 4, 'l': 2}
 mouthshape_height = {'1': 2, '2': 4, '3': 3, '4': 3, '5': 2, '6': 3, '7': 1, '8': 3, '9': 4, 'a': 4,
                      'b': 4, 'c': 1, 'd': 2, 'e': 3, 'f': 2, 'g': 3, 'h': 2, 'i': 1, 'j': 3, 'k': 3, 'l': 1}
+
+
 # script2 viseme file
 def eng2viseme(filename):
     cmu_d = nltk.corpus.cmudict.dict()
     f = open(filename, 'r')
-    outfile = 'sent_similarity/'+filename.split('/')[-1].replace('.txt', '_viseme.txt')
+
+    outfile = 'sent_similarity/' + filename.split('/')[-1].replace('.txt', '_viseme.txt')
+
     if path.exists(outfile):
         out = open(outfile, 'r')
         return [s.split() for s in out.readlines()]
@@ -47,9 +52,11 @@ def eng2viseme(filename):
     out.close()
     return result
 
+
 def kor2viseme(filename):
     f = open(filename, 'r', encoding='utf8')
-    outfile = 'sent_similarity/'+filename.split('/')[-1].replace('.txt', '_viseme.txt')
+    outfile = 'sent_similarity/' + filename.split('/')[-1].replace('.txt', '_viseme.txt')
+
     if path.exists(outfile):
         out = open(outfile, 'r')
         return [s.split() for s in out.readlines()]
@@ -57,7 +64,7 @@ def kor2viseme(filename):
     result = []
     for l in f.readlines():
         sent_pho = []
-        for w in l.split(): # w is each word in a line
+        for w in l.split():  # w is each word in a line
             entry = divideKoreanLetter(g2p(w))
             for letter in entry:
                 if len(letter) == 1:
@@ -79,6 +86,7 @@ def kor2viseme(filename):
     out.close()
     return result
 
+
 # giving length penalty
 def compare_viseme(l_vis1, l_vis2):
     vis1_height = [mouthshape_height[i] for i in l_vis1]
@@ -96,7 +104,7 @@ def compare_viseme(l_vis1, l_vis2):
         diff += math.sqrt(height_diff + width_diff)
 
     # longest = sum of longest Euclidean distance for n visemes
-    longest = math.sqrt(((5 - 1) ** 2) * 2) * shorter
+    longest = math.sqrt(((5 - 1)**2) + (4 - 1)**2) * shorter
     # similarity = 1 - diff / longest, if the visemes are all same, it is 1. if it is totally different, it is 0.
     similarity = 1 - diff / longest
     # length penalty = ratio**0.5
@@ -107,6 +115,7 @@ def compare_viseme(l_vis1, l_vis2):
     length_penalty = math.sqrt(ratio)
     score = length_penalty * similarity
     return score
+
 
 # match length of two viseme list to lcm of two length
 def compare_viseme2(l_vis1, l_vis2):
@@ -139,7 +148,7 @@ def compare_viseme2(l_vis1, l_vis2):
         diff += math.sqrt(height_diff + width_diff)
 
     # longest = sum of longest Euclidean distance for n visemes
-    longest = math.sqrt(((5 - 1) ** 2) * 2) * lcm
+    longest = math.sqrt(((5 - 1)**2 + (4-1)**2)) * lcm
     # similarity = 1 - diff / longest, if the visemes are all same, it is 1. if it is totally different, it is 0.
     similarity = 1 - diff / longest
     # length penalty = ratio**0.5
@@ -151,17 +160,49 @@ def compare_viseme2(l_vis1, l_vis2):
     score = length_penalty * similarity
     return score
 
+
+def compare_viseme3(l_vis1, l_vis2):
+    la = len(l_vis1)
+    lb = len(l_vis2)
+    vis1_height = [mouthshape_height[i] for i in l_vis1]
+    vis1_width = [mouthshape_width[i] for i in l_vis1]
+    vis2_height = [mouthshape_height[i] for i in l_vis2]
+    vis2_width = [mouthshape_width[i] for i in l_vis2]
+    d = [[0 for i in range(lb + 1)] for j in range(la + 1)]
+    dd = [[0 for i in range(lb + 1)] for j in range(la + 1)]
+    for i in range(1, la + 1):
+        d[i][0] = math.sqrt(vis1_height[i-1]**2 + vis1_width[i-1]**2)
+    for i in range(1, lb+1):
+        d[0][i] = math.sqrt(vis2_height[i-1]**2 + vis2_width[i-1]**2)
+        dd[0][i] = (vis2_height[i-1], vis2_width[i-1])
+    for i in range(1, la+1):
+        for j in range(1, lb+1):
+            if l_vis1[i-1] == l_vis2[j-1]:
+                d[i][j] = d[i-1][j-1]
+            else:
+                edit_cost = math.sqrt((vis1_height[i-1] - vis2_height[j-1])**2 + (vis1_width[i-1] - vis2_height[j-1])**2)
+                remove1_cost = math.sqrt(vis1_height[i-1]**2 + vis1_width[i-1]**2)
+                remove2_cost = math.sqrt(vis2_height[j-1]**2 + vis2_width[j-1]**2)
+                d[i][j]=min(d[i-1][j-1] + edit_cost, d[i][j-1]+remove2_cost, d[i-1][j-1]+remove1_cost)
+    longer = max(la, lb)
+    longest = math.sqrt((5**2 + 4**2)) * longer
+    # print(d[-1][-1], longest)
+    return 1 - d[-1][-1]/longest
+
+
+
 def compare_file(filename_en, filename_ko):
     enfile = open(filename_en, 'r', encoding='utf8')
-    ev_sents = eng2viseme(filename_en) # english text file to list of list of viseme
+    ev_sents = eng2viseme(filename_en)  # english text file to list of list of viseme
     kofile = open(filename_ko, 'r', encoding='utf8')
-    kv_sents = kor2viseme(filename_ko) # korean text file to list of list of viseme
+    kv_sents = kor2viseme(filename_ko)  # korean text file to list of list of viseme
+
     outfile = open('sent_similarity/comp_%s_%s.csv' %
                    (filename_en.split('/')[-1].split('.')[0], filename_ko.split('/')[-1].split('.')[0]),
                    'w', newline='', encoding='utf-8-sig')
     csvwriter = csv.writer(outfile)
-    sents_en = enfile.readlines() # english text file to list
-    sents_ko = kofile.readlines() # korean text file to list
+    sents_en = enfile.readlines()  # english text file to list
+    sents_ko = kofile.readlines()  # korean text file to list
     for i in range(min(len(sents_en), len(sents_ko))):
         score = compare_viseme(kv_sents[i], ev_sents[i])
         csvwriter.writerow([sents_ko[i].strip('\n'), sents_en[i].strip('\n'), "%f" % score])
@@ -171,36 +212,66 @@ print("test for 'cake' and '케이크'",
       compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
 print("test2 for 'cake' and '케이크'",
       compare_viseme2(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
+print("test3 for 'cake' and '케이크'",
+      compare_viseme3(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
+print()
 
 print("test for 'english' and '영어'",
       compare_viseme(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
 print("test2 for 'english' and '영어'",
       compare_viseme2(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
+print("test3 for 'english' and '영어'",
+      compare_viseme3(['6', 'k', 'k', 'e', '1', 'j', 'j'], ['6', '4', 'k', '4']))
+print()
 
 print("test for 'korea' and '고려'",
       compare_viseme(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
 print("test2 for 'korea' and '고려'",
       compare_viseme2(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
+print("test3 for 'korea' and '고려'",
+      compare_viseme3(['k', '3', 'd', '6', '1'], ['k', '8', 'j', '6', '4']))
+print()
 
 print("test for 'dream' and '꿈'",
       compare_viseme(['j', 'd', '6', 'l'], ['k', '7', 'l']))
 print("test2 for 'dream' and '꿈'",
       compare_viseme2(['j', 'd', '6', 'l'], ['k', '7', 'l']))
+print("test3 for 'dream' and '꿈'",
+      compare_viseme3(['j', 'd', '6', 'l'], ['k', '7', 'l']))
+print()
 
 print("test for 'mango' and '망고'",
       compare_viseme(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
 print("test2 for 'mango' and '망고'",
       compare_viseme2(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+print("test3 for 'mango' and '망고'",
+      compare_viseme3(['l', '1', 'k', 'k', '8'], ['l', '2', 'k', 'k', '8']))
+print()
 
 print("test for 'desk' and '책상'",
       compare_viseme(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
 print("test2 for 'desk' and '책상'",
       compare_viseme2(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+print("test3 for 'desk' and '책상'",
+      compare_viseme3(['j', '4', 'f', 'k'], ['g', '1', 'k', 'f', '2', 'k']))
+print()
+
+print("test for '키' and 'key'",
+      compare_viseme(['k', 'i'], ['k', 'i']))
+print("test2 for '키' and 'key'",
+      compare_viseme2(['k', 'i'], ['k', 'i']))
+print("test3 for '키' and 'key'",
+      compare_viseme3(['k', 'i'], ['k', 'i']))
+print()
 
 print("test for 'ah' and 'ah ah ah ah'",
       compare_viseme(['1'], ['1', '1', '1', '1']))
 print("test2 for 'ah' and 'ah ah ah ah'",
       compare_viseme2(['1'], ['1', '1', '1', '1']))
+print("test3 for 'ah' and 'ah ah ah ah'",
+      compare_viseme3(['1'], ['1', '1', '1', '1']))
+print()
 
-compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
-compare_file("Import_script/Bleak Night_ENG.txt", "Import_script/Bleak Night_KOR.txt")
+# compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
+# compare_file("Import_script/Bleak Night_ENG.txt", "Import_script/Bleak Night_KOR.txt")
+
