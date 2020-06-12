@@ -39,7 +39,7 @@ for iter in range(len(sentences_ENG)):
 
     pattern='[^\w\s]'
 
-    print(sentences_ENG[iter])
+    #print(sentences_ENG[iter])
     resub_KOR=re.sub(pattern=pattern,repl='',string=sentences_KOR[iter])
     resub_ENG=re.sub(pattern=pattern,repl='',string=sentences_ENG[iter])
     token_KOR = word_tokenize(resub_KOR)
@@ -124,7 +124,7 @@ for iter in range(len(sentences_ENG)):
                     break
                 
         bitmap[iter4] = len(compare)-sum(bitmap[:iter4])
-        print_paired(standard, compare, bitmap)
+        #print_paired(standard, compare, bitmap)
                 
         base=0
         pair_list=[]
