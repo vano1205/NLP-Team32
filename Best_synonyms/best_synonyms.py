@@ -16,7 +16,7 @@ from korean2phoneme import kor2phon
 from phoneme2viseme import pho2vi
 
 from similarity import compare_viseme
-
+import file_visemes
 #import Evaluate_updated
 #from Evaluate_updated import viseme_set_similarity
 
@@ -93,8 +93,11 @@ def set_viseme_list(pair_list):
                 eng_vis.append(viseme(w, "en"))
             i=i+1
             tmp.append((ko_vis, eng_vis))
-        print(tmp)
+        #print(tmp)
         list.append(tmp)
+    f = open('Best_synonyms/file_visemes.py','w')
+    f.write('list='+str(list))
+    f.close()
     return list
 
 #Find best synonym in terms of visemes similarity
@@ -124,10 +127,11 @@ result_pair = pairkoreng.result_pair
 viseme_list = []
 best_viseme_list = []
 
-viseme_list = set_viseme_list(result_pair)
+viseme_list = file_visemes.list
+#viseme_list = set_viseme_list(result_pair)
 
-print("set viseme list finish\n")
-print(viseme_list)
+#print("set viseme list finish\n")
+#print(viseme_list)
 best_viseme_list = viseme_list
 best_pairs = result_pair
 
