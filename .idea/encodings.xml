@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Import_script/Find_Kim_ENG.txt" charset="x-windows-949" />
+    <file url="file://$PROJECT_DIR$/Import_script/TheHost_ENG.txt" charset="x-windows-949" />
+    <file url="file://$PROJECT_DIR$/Import_script/WarOfFlower_ENG.txt" charset="x-windows-949" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
