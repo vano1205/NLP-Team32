@@ -209,7 +209,22 @@ def compare_file(filename_en, filename_ko):
         score = compare_viseme(kv_sents[i], ev_sents[i])
         csvwriter.writerow([sents_ko[i].strip('\n'), sents_en[i].strip('\n'), "%f" % score])
 
-
+def sents_scores(filename_en, filename_ko):
+    enfile = open(filename_en, 'r', encoding='utf8')
+    ev_sents = eng2viseme(filename_en)  # english text file to list of list of viseme
+    kofile = open(filename_ko, 'r', encoding='utf8')
+    kv_sents = kor2viseme(filename_ko)  # korean text file to list of list of viseme
+    list=[]
+    sents_en = enfile.readlines()  # english text file to list
+    sents_ko = kofile.readlines()  # korean text file to list
+    for i in range(min(len(sents_en), len(sents_ko))):
+        score = compare_viseme(kv_sents[i], ev_sents[i])
+        list.append(score)
+    f = open('sent_similarity/scores_Death_Bell.py','w')
+    f.write('list='+str(list))
+    f.close()
+    return list
+ 
 # print("test for 'cake' and '케이크'",
 #       compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
 # print("test2 for 'cake' and '케이크'",
@@ -274,6 +289,6 @@ def compare_file(filename_en, filename_ko):
 #       compare_viseme3(['1'], ['1', '1', '1', '1']))
 # print()
 
-compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
-compare_file("Import_script/Bleak Night_ENG.txt", "Import_script/Bleak Night_KOR.txt")
+#compare_file("Import_script/Death Bell_ENG.txt", "Import_script/Death Bell_KOR.txt")
+#compare_file("Import_script/Bleak Night_ENG.txt", "Import_script/Bleak Night_KOR.txt")
 
