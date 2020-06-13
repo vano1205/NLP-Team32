@@ -1,23 +1,23 @@
 import sys
 import os
-sys.path.append(os.path.abspath("Import_script"))
-sys.path.append(os.path.abspath("pairkoreng"))
-sys.path.append(os.path.abspath("korean2phoneme"))
-sys.path.append(os.path.abspath("phoneme2viseme"))
+
 sys.path.append(os.path.abspath("Best_synonyms"))
 sys.path.append(os.path.abspath("sent_similarity"))
 
-from similarity import compare_file
+rom similarity import compare_file
 import best_synonyms
-import pairkoreng
+#import pairkoreng
 #from best_synonyms import best_synonyms
 #from pairkoreng import pairkoreng
 
-file_en_1 ="Import_script/Death Bell_ENG.txt"
-file_ko_1 ="Import_script/Death Bell_KOR.txt"
+#file_en_1 ="Import_script/Death Bell_ENG.txt"
+#file_ko_1 ="Import_script/Death Bell_KOR.txt"
 
-file_en_2 ="Import_script/Bleak Night_ENG.txt"
-file_ko_2 ="Import_script/Bleak Night_KOR.txt"
+#file_en_2 ="Import_script/Bleak Night_ENG.txt"
+#file_ko_2 ="Import_script/Bleak Night_KOR.txt"
+
+#file_en_3 ="Import_script/Bleak Night_ENG.txt"
+#file_ko_3 ="Import_script/Bleak Night_KOR.txt"
 
 #pairs = best_synonyms.best_pairs
 
@@ -36,7 +36,7 @@ file_ko_2 ="Import_script/Bleak Night_KOR.txt"
 pairs = best_synonyms.best_pairs
 
 
-f=open("Results/Death_Bell_translation.txt", 'w')
+f=open("Results/Death_Bell_translation_method2.txt", 'w')
 for pair in pairs:
     i=0
     sent=''
@@ -53,4 +53,4 @@ for pair in pairs:
 
 f.close()
 
-compare_file("Results/Death_Bell_translation.txt", "Import_script/Death Bell_KOR.txt")
+compare_file("Results/Death_Bell_translation_method2.txt", "Import_script/Death Bell_KOR.txt")
