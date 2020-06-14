@@ -236,7 +236,7 @@ def find_best_syn(file_en, file_ko, pairs):
         # eng_token = word_tokenize(eng_script[b])
         eng_tagged = pos_tag(token_ENG)
 
-        while (sent_score < 0.535) and (p < len(pair_scores)):
+        while (sent_score < 0.6) and (p < len(pair_scores)):
             pair=pair_scores[p]
             exit=0
             i=0
