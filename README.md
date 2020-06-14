@@ -15,11 +15,11 @@ Translation of movie scripts for automatic lip synchronization
 * make clean : clean all files produced by main.py
 
 #### Dataset
-* "Import_script" folder contains 2 Korean scripts: "Bleak Night_KOR.txt" and "Death Bell_KOR.txt"
+* "Import_script" folder contains 5 Korean scripts from the movies Bleak Night, Death Bell, Find Kim, War of Flower and The Host.
 They are translated into English with ImportScript.py
 
 #### Results
-* "Results" folder contains two files with the translation done by our algorithm.
+* "Results" folder contains files with the translation done by our algorithm for the 5 scripts.
 * In "sent_similarity" folder, the csv files show the scores of the translation for each sentence.
 
 #### References
