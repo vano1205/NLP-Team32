@@ -228,15 +228,38 @@ def compare_file(filename_en, filename_ko, out):
         sents_ko = kofile.readlines()
 
     csvwriter.writerow(
-        ["Original(Korean)", "Basic Translation(google trans)", "comp1 score", "comp2 score", "comp3 score"])
+        ["Original(Korean)", "Our Translation(google trans)", "comp1 score", "comp2 score", "comp3 score"])
     for i in range(min(len(sents_en), len(sents_ko))):
-        print(i)
+<<<<<<< HEAD
+=======
+        #print(i)
+>>>>>>> 72a9566acd5882ebd6c4b687bacf3ad03817cc14
         score = compare_viseme(kv_sents[i], ev_sents[i])
         score2 = compare_viseme2(kv_sents[i], ev_sents[i])
         score3 = compare_viseme3(kv_sents[i], ev_sents[i])
         csvwriter.writerow(
             [sents_ko[i].strip('\n'), sents_en[i].strip('\n'), "%f" % score, "%f" % score2, "%f" % score3])
 
+
+
+def sents_scores(filename_en, filename_ko):
+    enfile = open(filename_en, 'r', encoding='utf8')
+    ev_sents = eng2viseme(filename_en)  # english text file to list of list of viseme
+    kofile = open(filename_ko, 'r', encoding='utf8')
+    kv_sents = kor2viseme(filename_ko)  # korean text file to list of list of viseme
+    list=[]
+    sents_en = enfile.readlines()  # english text file to list
+    sents_ko = kofile.readlines()  # korean text file to list
+    for i in range(min(len(sents_en), len(sents_ko))):
+        score = compare_viseme(kv_sents[i], ev_sents[i])
+        list.append(score)
+
+    #f = open('sent_similarity/scores_Death_Bell.py','w')
+    file = filename_en.replace(' ', '_')
+    f = open('sent_similarity/scores_' + file.split('/')[-1].replace('_ENG.txt', '.py'), 'w')
+    f.write('list='+str(list))
+    f.close()
+    return list
 
 # print("test for 'cake' and '케이크'",
 #       compare_viseme(['k', '4', 'k'], ['k', '1', '6', 'k', '6']))
@@ -313,11 +336,25 @@ def compare_file(filename_en, filename_ko, out):
 # compare_file("Import_script/Find_kim_ENG.txt", "Import_script/Find_Kim_KOR.txt",
 #              "sent_similarity/FindKim_comp_basic.csv")
 # print("Find Kim complete!")
+#
+# compare_file("Import_script/TheHost_ENG.txt", "Import_script/TheHost_KOR.txt",
+#              "sent_similarity/TheHost_comp_basic.csv")
+# print("The Host complete!")
+#
+# compare_file("Import_script/WarOfFlower_ENG.txt", "Import_script/WarOfFlower_KOR.txt",
+#              "sent_similarity/WarOfFlower_comp_basic.csv")
+# print("War of Flower complete!")
 
-compare_file("Import_script/TheHost_ENG.txt", "Import_script/TheHost_KOR.txt",
-             "sent_similarity/TheHost_comp_basic.csv")
-print("The Host complete!")
+<<<<<<< HEAD
+compare_file("Results/Death_Bell_translation_method2.txt", "Import_script/Death Bell_KOR.txt",
+             "sent_similarity/DeathBell_comp_our.csv")
+=======
+#compare_file("Import_script/TheHost_ENG.txt", "Import_script/TheHost_KOR.txt",
+#             "sent_similarity/TheHost_comp_basic.csv")
+#print("The Host complete!")
 
-compare_file("Import_script/WarOfFlower_ENG.txt", "Import_script/WarOfFlower_KOR.txt",
-             "sent_similarity/WarOfFlower_comp_basic.csv")
-print("War of Flower complete!")
+#compare_file("Import_script/WarOfFlower_ENG.txt", "Import_script/WarOfFlower_KOR.txt",
+#             "sent_similarity/WarOfFlower_comp_basic.csv")
+#print("War of Flower complete!")
+
+>>>>>>> 72a9566acd5882ebd6c4b687bacf3ad03817cc14
